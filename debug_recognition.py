@@ -114,7 +114,7 @@ def debug_recognition():
                     if label in label_dict:
                         raw_name = label_dict[label]
                         name = raw_name.split('-', 1)[1].strip() if '-' in raw_name else raw_name
-                        status = "[OK] RECOGNIZED" if confidence < 62 else "⚠️  LOW CONFIDENCE"
+                        status = "[OK] RECOGNIZED" if confidence < 95 else "⚠️  LOW CONFIDENCE"
                     else:
                         name = "Unknown Student"
                         status = "❌ NOT IN DATABASE"
@@ -128,7 +128,7 @@ def debug_recognition():
                     print(f"  Face Size: {w}x{h} pixels")
                     
                     # Draw on frame
-                    threshold = 62
+                    threshold = 95
                     color = (0, 255, 0) if confidence < threshold else (0, 165, 255)
                     cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
                     

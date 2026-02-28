@@ -1,73 +1,46 @@
-# 🎓 Smart Attendance System using Face Recognition
+# Smart Attendance System (Production Release)
 
-This is a **Face Recognition-based Attendance System** built with Python and OpenCV. The system automatically detects, recognizes students' faces via webcam, and logs their daily attendance into an organized digital record (CSV).
+This system has been upgraded from a basic OpenCV Haar Cascades script to a robust, scalable microservices architecture utilizing Deep Learning, Vector Databases, and WebRTC.
 
-This project demonstrates practical applications of Computer Vision & Image Processing (CVIP) by automating manual roll calls, reducing time waste, and preventing proxy attendance.
+## 🚀 Architecture Highlights
 
-## ✨ Features
-- **Centralized CLI Dashboard**: A unified `main.py` entry point to manage everything.
-- **Student Registration**: Auto-capture 60 training images from various head poses directly via webcam.
-- **Model Training**: Employs Haar Cascade for face detection and OpenCV's LBPH (Local Binary Patterns Histograms) Face Recognizer for training.
-- **Real-Time Recognition Multi-tracker**: Effectively scans multiple faces concurrently, requiring continuous frame consistency to reduce false positives.
-- **Automated Logging**: Logs recognized students directly into an `attendance.csv` file automatically (and restricts it to once per day per student).
-- **Diagnostics Tools**: Built-in scripts like `test_webcam.py` and `debug_recognition.py` for troubleshooting.
-
-## ⚙️ Tech Stack
-- **Python** (Core Language)
-- **OpenCV (`opencv-python`, `opencv-contrib-python`)** (Face Detection, Image Processing, real-time bounding boxes)
-- **Numpy** (Matrix / Array manipulations for image data)
+1. **Backend API (FastAPI)**: Handles all core logic, database transactions, and model inferences natively on port `8000`.
+2. **Deep Learning Engine (DeepFace)**: Uses `RetinaFace` for ultra-accurate multi-face detection and `ArcFace` to generate 512-dimensional facial embeddings.
+3. **Storage (SQLite & ChromaDB)**: Relational metadata and attendance logs are securely stored in SQLite, while facial signatures are indexed in ChromaDB for instantaneous Cosine Similarity retrieval.
+4. **Anti-Spoofing**: Lightweight heuristic liveness check ensures that flat 2D representations (photos) are blocked.
+5. **Frontend Dashboard (Streamlit)**: A modern, real-time web interface running on port `8501`. Features live webcam streaming, dual-status dynamic attendance cards, and admin dashboard rendering.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🛠️ How to Run in Production
 
-### 1. Installation
-Clone the repository and install the required dependencies:
+You need to run two separate processes to start the system: the **Backend API** and the **Frontend Dashboard**.
+
+### 1. Install Dependencies
+Make sure your environment is activated and install the updated requirements:
 ```bash
-git clone https://github.com/YOUR-USERNAME/Smart_Attendance_Monitoring_CGIP.git
-cd Smart_Attendance_Monitoring_CGIP
 pip install -r requirements.txt
 ```
 
-### 2. Validating System (Optional)
-Run the diagnostic script to ensure your camera and system structure are accessible.
+### 2. Start the FastAPI Backend
+The backend engine must be running for the frontend to work.
 ```bash
-python quick_start.py
+# Run this in Terminal 1
+python -m uvicorn server:app --host 0.0.0.0 --port 8000
 ```
+*The API Swagger Docs will be available at: http://localhost:8000/docs*
 
-### 3. Start the Application
-Boot up the main control panel:
+### 3. Start the Streamlit Frontend
+Once the backend is live, launch the user interface.
 ```bash
-python main.py
+# Run this in Terminal 2
+python -m streamlit run app.py
 ```
+*The Web App will be available at: http://localhost:8501*
 
-From the Main Menu, run through the workflow linearly:
-1. **Register New Student (Option 1):** Follow prompts to type ID and Name. Look at the camera to collect dataset faces. 
-2. **Train Model (Option 2):** Compiles the registered datasets into `trainer.yml` for the AI to benchmark against.
-3. **Start Attendance (Option 3):** Launch real-time detection. When a face matches the model, it draws a green box, marks attendance, and pushes the record safely to the CSV! 
+---
 
-Press *'Q'* at any time to close an active camera window.
-
-## 📂 Project Structure
-```text
-Smart_Attendance_Monitoring_CGIP/
-│
-├── main.py                  # Centralized CLI application logic
-├── register_face.py         # Capture face images & assigns labels
-├── train_model.py           # Preprocesses images & trains LBPH logic
-├── recognize_attendance.py  # Performs real-time recognition loop
-├── debug_recognition.py     # Diagnostics tool to see live confidence figures
-│
-├── requirements.txt         # Required Python packages
-├── dataset/                 # Stores raw .jpg imagery per student ID
-├── trainer/                 # Contains compiled .yml learning model
-└── attendance/              # Output directory for daily attendance.csv
-```
-
-## 🧠 How it Works Under the Hood
-This project uses **Haar Cascades** for fast initial bounding-box detection in frames. Captured regions of interest (ROI) are converted to grayscale and normalized. 
-
-During the recognition loop, the **LBPH Recognizer** attempts to match real-time ROI histograms against the trained `trainer.yml` weights. If the confidence distance figure falls safely below the target threshold for consecutive frames, the subject identity is confirmed!
-
-## 📝 License
-Feel free to use for educational and structural inspiration!
+## 📝 Features & Usage
+- **Live View**: Stand in front of the camera. The system will detect multiple faces simultaneously, verify liveness, compute geographic vectors, and explicitly render individual status cards (✅ Recognized, ⚠️ Already Present, ❌ Not Recognized).
+- **Registration**: Navigate to the *"📝 Registration"* tab, enter a Student ID and Name, snap a clear photo, and their ArcFace embedding will be instantly stored in ChromaDB.
+- **Admin Logs**: Navigate to the *"📊 Admin Logs"* tab to view and filter the SQLite attendance records for any specific day.

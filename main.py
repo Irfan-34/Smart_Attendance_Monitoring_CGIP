@@ -32,11 +32,11 @@ def clear_screen():
 def display_menu():
     """Display the main menu"""
     print("\n" + "="*60)
-    print("     SMART ATTENDANCE SYSTEM USING FACE RECOGNITION")
+    print("  SMART ATTENDANCE SYSTEM (DEEP LEARNING EDITION)")
     print("="*60)
-    print("\n1. Register New Student")
-    print("2. Train Face Recognition Model")
-    print("3. Start Attendance System")
+    print("\n1. Register New Student (Extract Face Vector)")
+    print("2. Verify Embeddings Database")
+    print("3. Start Live Attendance (ArcFace Recognition)")
     print("4. View Registered Students")
     print("5. View Attendance Records")
     print("6. Exit")
@@ -79,14 +79,14 @@ def view_registered_students():
             except:
                 pass
         
-        # Count face samples
+        # Count embeddings
         for file in os.listdir(student_path):
-            if file.endswith(('.jpg', '.jpeg', '.png')):
+            if file.endswith(('.jpg', '.npy')):
                 sample_count += 1
         
         print(f"\n  ID: {student_id}")
         print(f"  Name: {student_name}")
-        print(f"  Samples: {sample_count}")
+        print(f"  Vectors/Images: {sample_count}")
     
     print("\n" + "-"*60)
     input("\nPress Enter to continue...")
