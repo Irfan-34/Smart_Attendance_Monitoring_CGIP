@@ -91,6 +91,13 @@ def get_student_id_from_label(label_name):
     return label_name
 
 
+def get_student_name_from_label(label_name):
+    """Extract student name from label name (e.g., '001 - John' → 'John')."""
+    if '-' in label_name:
+        return label_name.split('-', 1)[1].strip()
+    return label_name
+
+
 def mark_attendance(student_id, student_name):
     """
     Mark attendance for a student (once per day per student).
@@ -300,15 +307,16 @@ def start_attendance():
                             'streak': 1,
                             'confirmed': False,
                             'student_id': get_student_id_from_label(label_dict[label]) if is_known else None,
-                            'student_name': label_dict[label] if is_known else 'Unknown',
+                            'student_name': get_student_name_from_label(label_dict[label]) if is_known else 'Unknown',
                         })
 
                 # Refresh student info on confirmed trackers
                 for t in new_trackers:
                     if t['confirmed']:
                         is_known = (t['conf'] < CONFIDENCE_THRESHOLD) and (t['label_id'] in label_dict)
-                        t['student_name'] = label_dict[t['label_id']] if is_known else 'Unknown'
-                        t['student_id'] = get_student_id_from_label(t['student_name']) if is_known else None
+                        full_label = label_dict[t['label_id']] if is_known else 'Unknown'
+                        t['student_name'] = get_student_name_from_label(full_label) if is_known else 'Unknown'
+                        t['student_id'] = get_student_id_from_label(full_label) if is_known else None
 
             trackers = new_trackers
 
@@ -321,7 +329,7 @@ def start_attendance():
                 sid = t['student_id']
 
                 # Predicted label name (even if below threshold, show who it thinks it is)
-                predicted_name = label_dict.get(t['label_id'], '??')
+                predicted_name = get_student_name_from_label(label_dict.get(t['label_id'], '??'))
 
                 # Color: green = confirmed known | red = unknown/pending
                 if confirmed and name != 'Unknown':

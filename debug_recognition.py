@@ -112,7 +112,8 @@ def debug_recognition():
                     
                     # Get name
                     if label in label_dict:
-                        name = label_dict[label]
+                        raw_name = label_dict[label]
+                        name = raw_name.split('-', 1)[1].strip() if '-' in raw_name else raw_name
                         status = "[OK] RECOGNIZED" if confidence < 62 else "⚠️  LOW CONFIDENCE"
                     else:
                         name = "Unknown Student"
